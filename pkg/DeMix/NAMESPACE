@@ -1,0 +1,4 @@
+useDynLib(DeMix)
+export(DeMix.Normalization)
+export(DeMix.S1)
+export(DeMix.S2)
