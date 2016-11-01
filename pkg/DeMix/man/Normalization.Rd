@@ -1,3 +1,5 @@
+% $Id$
+
 \name{DeMix.Normalization}
 \alias{DeMix.Normalization}
 \title{
@@ -39,7 +41,8 @@ Wu H, Wang C and Wu Z (2013). “A new shrinkage estimator for dispersion improv
  http://odin.mdacc.tmc.edu/~wwang7/DeMix.html
 }
 \examples{
- data(ntot_NT_Liver)
- input <- ntot_NT_Liver
- newtfile <- DeMix.Normalization(input, method="quantile" ,60,151)
+data(ntot_NT_Liver)
+input <- ntot_NT_Liver
+newtfile <- DeMix.Normalization(input, method="quantile" ,60,151)
 }
+

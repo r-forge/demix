@@ -1,3 +1,5 @@
+% $Id$
+
 \name{DeMix.Filter}
 \alias{DeMix.Filter}
 \docType{package}
@@ -54,7 +56,4 @@ data(ntot_NT_Liver)
 input <- ntot_NT_Liver
 newtfile <- DeMix::DeMix.Filter(input,c(rep(0, 50), rep(1, 151)), zero_filter=TRUE, conc=0.8, fc=1.2)
 }
-
-
-
 

@@ -1,3 +1,7 @@
+/*
+ * %Id%
+ */
+
 #ifndef _Jaeil_H
 #define _Jaeil_H
 

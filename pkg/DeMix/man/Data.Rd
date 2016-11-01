@@ -1,3 +1,5 @@
+% $Id$
+
 \name{DeMix.Data}
 \alias{DeMix.Data}
 \docType{package}
@@ -42,3 +44,4 @@ Jaeil Ahn
 \examples{
  data(ntot_NT_Liver)
 }
+
