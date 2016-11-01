@@ -1,51 +1,85 @@
+<!-- $Id$ -->
+<!-- This is the project specific website -->
 
-<!-- This is the project specific website template -->
-<!-- It can be changed as liked or replaced by other content -->
-
-<?php
-
-$domain=ereg_replace('[^\.]*\.(.*)$','\1',$_SERVER['HTTP_HOST']);
-$group_name=ereg_replace('([^\.]*)\..*$','\1',$_SERVER['HTTP_HOST']);
-$themeroot='r-forge.r-project.org/themes/rforge/';
-
-echo '<?xml version="1.0" encoding="UTF-8"?>';
-?>
-<!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en   ">
-
-  <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<title><?php echo $group_name; ?></title>
-	<link href="http://<?php echo $themeroot; ?>styles/estilo1.css" rel="stylesheet" type="text/css" />
-  </head>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>estimate</title>
+  <link rel="stylesheet"
+        type="text/css"
+        href="http://r-forge.r-project.org/themes/rforge/styles/estilo1.css" />
+</head>
 <body>
+  <header>
+    <!-- R-Forge Logo -->
+    <a href="http://r-forge.r-project.org/">
+      <img src="http://r-forge.r-project.org/themes/rforge//imagesrf/logo.png"
+           border="0"
+           alt="R-Forge Logo" />
+    </a>
+  </header>
 
-<!-- R-Forge Logo -->
-<table border="0" width="100%" cellspacing="0" cellpadding="0">
-<tr><td>
-<a href="http://r-forge.r-project.org/"><img src="http://<?php echo $themeroot; ?>/imagesrf/logo.png" border="0" alt="R-Forge Logo" /> </a> </td> </tr>
-</table>
+  <main class="content" role="main">
+    <p>
+      Tumor samples consisting of both cancer and stromal tissues are a major
+      cause of under-detection of gene expression biomarkers for cancer
+      prognosis. <i>In silico</i> dissection of mixture components is essential
+      for analyzing expression data generated in cancer studies.<br />
+      This project implements a statistical approach for deconvolving mixed
+      cancer transcriptomes that assesses tumor-specific proportions in mixed
+      tumor samples using the raw-measured data and reconstitutes individual
+      gene expressions of normal and tumor samples. 
+    </p>
 
+    <div class="articleinfo">
+      <div class="authorgroup">
+        <span class="author">
+          <span class="firstname">Jaeil</span>
+          <span class="surname">Ahn</span>,
+        </span>
+        <span class="author">
+          <span class="firstname">Ying</span>
+          <span class="surname">Yuan</span>,
+        </span>
+        <span class="author">
+          <span class="firstname">Giovanni</span>
+          <span class="surname">Parmigiani</span>,
+        </span>
+        <span class="author">
+          <span class="firstname">Milind</span>
+          <span class="surname">Suraokar</span>,
+        </span>
+        <span class="author">
+          <span class="firstname">Lixia</span>
+          <span class="surname">Diao</span>,
+        </span>
+        <span class="author">
+          <span class="firstname">Ignacio</span>
+          <span class="surname">Wistuba</span>,
+        </span> &amp;
+        <span class="author">
+          <span class="firstname">Wenyi</span>
+          <span class="surname">Wang</span>
+        </span>
+      </div>
+      (<span class="pubdate">2013</span>).<br />
+      <div class="title">
+        <span class="article">DeMix: deconvolution for mixed cancer transcriptomes using raw measured data</span>
+        [<a href="http://bioinformatics.oxfordjournals.org/content/29/15/1865.full">HTML</a>,
+         <a href="http://bioinformatics.oxfordjournals.org/content/29/15/1865.full.pdf">PDF</a>]
+      </div>
+      <div class="source">
+        <div class="journal">Bioinformatics <span class="volumenum">29</span>(<span class="issuenum">15</span>): <span class="artpagenums">1865-1871</span></div>
+      </div><br />
+    </div>
 
-<!-- get project title  -->
-<!-- own website starts here, the following may be changed as you like -->
-
-<?php if ($handle=fopen('http://'.$domain.'/export/projtitl.php?group_name='.$group_name,'r')){
-$contents = '';
-while (!feof($handle)) {
-	$contents .= fread($handle, 8192);
-}
-fclose($handle);
-echo $contents; } ?>
-
-<!-- end of project description -->
-
-<p> No content added. </p>
-
-<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
-
+    <p>
+      Click
+      <a href="http://r-forge.r-project.org/projects/estimate/">
+      <strong>here</strong></a> for the R-Forge <strong>project summary page</strong>.
+    </p>
+  </main>
 </body>
 </html>
+
