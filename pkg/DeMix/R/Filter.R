@@ -1,8 +1,8 @@
+###
+### %Id%
+###
 
-#DeMix.Filter
-############################################################
-
-
+##-----------------------------------------------------------------------------
 DeMix.Filter<-function(newt, nnormal, ntumor, ntgroup=c(rep(0,nnormal),rep(1,ntumor)), zero_filter=TRUE, conc=0.8, fc=1.2)
 {
   ## 0 denotes normal cell while 1 denote mixed tumor cell

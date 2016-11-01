@@ -1,5 +1,9 @@
-#DeMix.Normalization 
-############################################################
+###
+### %Id%
+###
+
+
+##-----------------------------------------------------------------------------
 DeMix.Normalization <- function(input,
                                 method=c("total", "quantile", "median"),
                                 groupid,
@@ -26,3 +30,4 @@ DeMix.Normalization <- function(input,
 
   newt
 }
+

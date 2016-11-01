@@ -1,10 +1,9 @@
-# #####################################################################
-# DeMix, Deconvolution for Mixed cancer genome
-# Developed by Jaeil Ahn.
-# Updated date : 11/01/2012
-# Article : DeMix : Decovolution for Mixed cacer genomes
-# using raw measured data.
+###
+### %Id%
+###
 
+
+# #####################################################################
 # How to use :
 #
 # inputmat1 : matrix after RMA normalization.  G*S matrix
@@ -23,6 +22,7 @@
 #nPoi= 1;ninteg= 28
 
 
+##-----------------------------------------------------------------------------
 DeMix.model <- function(input, nnormal, ntumor, groupid=c(rep(0,nnormal),rep(1,ntumor), nhavepi, givenpi, ninteg, ncore, methods,  ) {
 
 
@@ -30,9 +30,9 @@ input.norm <- DeMix.Normalization(input, method, groupid)
 input.filt <- DeMix.Filter(input.norm, nnormal,ntumor, groupid=c(rep(0,nnormal),rep(1,ntumor))
 
 
-	if(!is.matrix(inputmat1)) stop(sprintf("argument %s must be a matrix",
-	                                       sQuote("inputmat1")))
-	if(!is.vector(groupid)) stop(sprintf("argument %s must be a vector",sQuote("groupid")))
+    if(!is.matrix(inputmat1)) stop(sprintf("argument %s must be a matrix",
+                                           sQuote("inputmat1")))
+    if(!is.vector(groupid)) stop(sprintf("argument %s must be a vector",sQuote("groupid")))
 
 seeds <- c(629555906, 921927245, 1265635378)
 
@@ -53,37 +53,37 @@ seeds <- c(629555906, 921927245, 1265635378)
 
   newovs<-c(abs(ovsn), abs(ovst))
 
-	if(nhavepi==1){
-		if(!is.vector(givenpi)) stop("argument 5 must be a vector if pi is known");
+    if(nhavepi==1){
+        if(!is.vector(givenpi)) stop("argument 5 must be a vector if pi is known");
     givenpi=(as.array(givenpi))
-	} else {
+    } else {
     givenpi=(as.array(rep(0, intx)))
   }
 
-	groupid<-(as.array(groupid))
+    groupid<-(as.array(groupid))
 
   if(ninteg<10) ninteg=10;
 
-	#dyn.load("main_firstparallel.so")
+    #dyn.load("main_firstparallel.so")
 
-	rres <- .C("Bdemix", dataarray1, as.integer(ncore), as.integer(groupid), as.integer(nsub),
-						 as.integer(wgenes),  as.integer(cbit), as.integer(nhavepi ), givenpi,
-						 as.integer(nPoi), as.integer(ninteg), newovs, rep(0, intx*3), rep(0, intx*3),
-						 rep(0, nsub*wgenes), rep(0, nsub*wgenes), rep(0, 500*wgenes), rep(0, 2*wgenes),
-						 seeds)
+    rres <- .C("Bdemix", dataarray1, as.integer(ncore), as.integer(groupid), as.integer(nsub),
+                         as.integer(wgenes),  as.integer(cbit), as.integer(nhavepi ), givenpi,
+                         as.integer(nPoi), as.integer(ninteg), newovs, rep(0, intx*3), rep(0, intx*3),
+                         rep(0, nsub*wgenes), rep(0, nsub*wgenes), rep(0, 500*wgenes), rep(0, 2*wgenes),
+                         seeds)
 
-	outcome2<-matrix(rres[[14]], ncol=(nsub) , nrow=wgenes, byrow = T)
+    outcome2<-matrix(rres[[14]], ncol=(nsub) , nrow=wgenes, byrow = T)
 
   outcome2<-outcome2[, ((intn+1):nsub)];
 
   outcome3<-matrix(rres[[15]], ncol=(nsub) , nrow=wgenes, byrow = T)
   outcome3<-outcome3[, ((intn+1):nsub)];
 
-	outcome1<-matrix(rres[[12]], ncol=intx, nrow=3, byrow=T)
+    outcome1<-matrix(rres[[12]], ncol=intx, nrow=3, byrow=T)
   outcomePoi<-matrix(rres[[13]], ncol=intx, nrow=3, byrow=T)
   post<-matrix(rres[[16]], ncol=500, nrow=wgenes, byrow = F)
   mung<-matrix(rres[[17]], ncol=2, nrow=wgenes, byrow = F)
 
-	return(list(pi = outcome1, Poipi=outcomePoi , decov = round(outcome2,0),  decovn = outcome3, munt=mung))
+    return(list(pi = outcome1, Poipi=outcomePoi , decov = round(outcome2,0),  decovn = outcome3, munt=mung))
 }
 
