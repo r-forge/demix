@@ -16,8 +16,8 @@ DeMix.Filter <- function(newt,
     stopifnot(is.matrix(newt) && is.numeric(newt[, 1]) && !anyNA(newt))
     stopifnot(is.numeric(nnormal) && length(nnormal) == 1 && nnormal >= 0)
     stopifnot(is.numeric(ntumor)  && length(ntumor)  == 1 && ntumor  >= 0)
-    stopifnot(is.logical(zero_filter) && length(zero_filter) == 1)
     stopifnot(is.numeric(ntgroup) && !anyNA(ntgroup))
+    stopifnot(is.logical(zero_filter) && length(zero_filter) == 1)
     stopifnot(is.numeric(conc) && length(conc) == 1)
     stopifnot(is.numeric(fc) && length(fc) == 1)
 
@@ -28,6 +28,7 @@ DeMix.Filter <- function(newt,
     genes.withoutzero <- apply(newt, 1, min) > 0
   
     if (zero_filter) {
+        ## :PLR: Which means "ntgroup" will no longer correspond to "newt" cols
         RNA <- newt[genes.withoutzero == TRUE, ]
     }
 
