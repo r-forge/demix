@@ -23,7 +23,16 @@
 
 
 ##-----------------------------------------------------------------------------
-DeMix.model <- function(input, nnormal, ntumor, groupid=c(rep(0,nnormal),rep(1,ntumor), nhavepi, givenpi, ninteg, ncore, methods,  ) {
+DeMix.model <- function(input,
+                        nnormal,
+                        ntumor,
+                        groupid=c(rep(0, nnormal),
+                                  rep(1, ntumor)),
+                        nhavepi,
+                        givenpi,
+                        ninteg,
+                        ncore,
+                        methods) {
 
 
 input.norm <- DeMix.Normalization(input, method, groupid)
@@ -84,6 +93,10 @@ seeds <- c(629555906, 921927245, 1265635378)
   post<-matrix(rres[[16]], ncol=500, nrow=wgenes, byrow = F)
   mung<-matrix(rres[[17]], ncol=2, nrow=wgenes, byrow = F)
 
-    return(list(pi = outcome1, Poipi=outcomePoi , decov = round(outcome2,0),  decovn = outcome3, munt=mung))
+    list(pi=outcome1,
+         Poipi=outcomePoi,
+         decov=round(outcome2, 0),
+         decovn=outcome3,
+         munt=mung)
 }
 
