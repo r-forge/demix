@@ -2,7 +2,7 @@
 
 \name{DeMix.Data}
 \alias{DeMix.Data}
-\docType{package}
+\docType{data}
 \title{
   DeMix.Data
 }
@@ -37,11 +37,13 @@ Jaeil Ahn
 }
 \references{[1] Shen-Orr, Shai S and Tibshirani, Robert and Khatri, Purvesh and Bodian, Dale L and Staedtler, Frank and Perry, Nicholas M and Hastie, Trevor and Sarwal, Minnie M and Davis, Mark M and Butte, Atul J. Cell type-specific gene expression differences in complex tissues. Nature Method. 7(4):287-289, 2010.
  }
-\keyword{ Bayesian Model, Deconvolution, Mixed Cancer Transcriptomes}
 \seealso{
  http://odin.mdacc.tmc.edu/~wwang7/DeMix.html
 }
 \examples{
  data(ntot_NT_Liver)
 }
+\concept{Bayesian Model}
+\concept{Deconvolution}
+\concept{Mixed Cancer Transcriptomes}
 
