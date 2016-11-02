@@ -11,6 +11,7 @@ Description: Implementation of a statistical method for deconvolving
   tumor and stromal tissues.
 Depends: R (>= 3.2), parallel
 Imports: utils, DSS
+Suggests: DeMixSampleData
 URL: http://r-forge.r-project.org/projects/demix
 License: Artistic-2.0
 Copyright: file COPYRIGHTS
