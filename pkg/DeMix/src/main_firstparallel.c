@@ -2,7 +2,7 @@
  * $Id$
  */
 
-/***************************************************************************************************************
+/*******************************************************************************
 * RNAseq modeling
 * Gene expression analysis under Three group is first done
 * By Jaeil Ahn
@@ -10,14 +10,17 @@
 * Last Update  08.04.2016
 * input type : number of sample, phenotype, genes
 * ex ./tp 3 1500
-****************************************************************************************************************/
+*******************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <time.h>
-#include <string.h>
-#include "bayes_para.h"
+#include <errno.h>
 #include <pthread.h>
+#include <R.h>
+#include "bayes_para.h"
 //  R CMD SHLIB main_firstparallel.c
 
 
@@ -30,18 +33,26 @@ typedef struct threadInfoStruct {
 } threadInfo;
 int numThreads;
 
-//# 17 arguments
-void Bdemix(double *data, int *ncore,int *nGroup, int *nsamp, int *ngenes, int *ct, int *npi, double *fixpi,
-            int *nmodel, int *ninteg, double *newovs, double *output1, double *output2, double *output3,
-            double *output32,  double *output4,  double *outputmu, double* seedv)
+//# 17 arguments (about a dozen too many)
+void Bdemix(double *data,
+            int *ncore,
+            int *nGroup,
+            int *nsamp,
+            int *ngenes,
+            int *ct,
+            int *npi,
+            double *fixpi,
+            int *nmodel,
+            int *ninteg,
+            double *newovs,
+            double *output1,
+            double *output2,
+            double *output3,
+            double *output32,
+            double *output4,
+            double *outputmu,
+            double* seedv)
 {
-
-  seed = (unsigned long *)calloc(3,sizeof(unsigned long));
-  for (int i=0; i < 3; ++i) {
-    seed[i] = seedv[i];
-  }
-
-  printf("starting DeMixbayes... \n");
   int i, j, k, l ,s, q;
   int iteration2=iteration;
   int burn2;
@@ -60,6 +71,8 @@ void Bdemix(double *data, int *ncore,int *nGroup, int *nsamp, int *ngenes, int *
   integ=*ninteg;
   nHavepi=*npi;
 
+  printf("starting DeMixbayes... \n");
+
   // printf("Starting random number generator...\n");
 
   // Random number read
@@ -71,6 +84,11 @@ void Bdemix(double *data, int *ncore,int *nGroup, int *nsamp, int *ngenes, int *
   //fclose(fseed);
 
   // printf("....done with random number generator setup\n");
+  seed = (unsigned long *)calloc(3,sizeof(unsigned long));
+  for (int i=0; i < 3; ++i) {
+    seed[i] = seedv[i];
+  }
+
 
   // If we have pi, we do not need to go lots of iterations.
   if(nHavepi==1)
@@ -78,8 +96,11 @@ void Bdemix(double *data, int *ncore,int *nGroup, int *nsamp, int *ngenes, int *
     iteration2=500;
     burn2=490;
     // Average of the last ten iterations will be used for deconvolved expressions
-  } else
+  }
+  else
+  {
     iteration2=iteration;
+  }
 
   M = exp(-*ct*log(2.0));  /* for *ct bit machines/compilers */
 
@@ -105,7 +126,6 @@ void Bdemix(double *data, int *ncore,int *nGroup, int *nsamp, int *ngenes, int *
 
     for(k=0;k<nG;k++)
       CD[j][k]=calloc(2, sizeof(double));
-
   }
 
   initialSet(p);
