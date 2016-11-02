@@ -35,15 +35,15 @@ DeMix.model <- function(input,
                         method=c("total", "quantile", "median")) {
     ## Check arguments
     stopifnot(is.matrix(input) && is.numeric(input[, 1]) && !anyNA(input))
-    stopifnot(is.numeric.scalar(nnormal) && nnormal >= 0)
-    stopifnot(is.numeric.scalar(ntumor)  && ntumor  >= 0)
+    stopifnot(is.scalar.numeric(nnormal) && nnormal >= 0)
+    stopifnot(is.scalar.numeric(ntumor)  && ntumor  >= 0)
     stopifnot(is.numeric(groupid) && !anyNA(groupid) && length(groupid) >= 2)
 # :PLRL: "nhavepi" seems logical, but numeric?
-    stopifnot(is.numeric.scalar(nhavepi))
+    stopifnot(is.scalar.numeric(nhavepi))
 # :PLR: Maybe default "givenpi" to null and check for that condition - eliminate "nhavepi" altogether
 # :PLR: Precondition checking missing... (givenpi)
-    stopifnot(is.numeric.scalar(ninteg))
-    stopifnot(is.numeric.scalar(ncore))
+    stopifnot(is.scalar.numeric(ninteg))
+    stopifnot(is.scalar.numeric(ncore))
     method <- match.arg(method)
 # :PLR: Arguments should be ordered by likelihood of needing to specify them
 
@@ -51,16 +51,15 @@ DeMix.model <- function(input,
     ## 
 
     input.norm <- DeMix.Normalization(input, method, groupid)
-    input.filt <- DeMix.Filter(input.norm,
+    input.mat  <- DeMix.Filter(input.norm,
                                nnormal,
                                ntumor,
-                               groupid=c(rep(0, nnormal), rep(1, ntumor))
-    input.mat <- input.filt
+                               groupid=c(rep(0, nnormal), rep(1, ntumor)))
 
 seeds <- c(629555906, 921927245, 1265635378)
 
-    nsub <- as.integer(dim(input.mat)[2])
-    wgenes <- as.integer(dim(input.mat)[1])
+    nsub   <- ncol(input.mat)
+    wgenes <- nrow(input.mat)
 
     input.arr <- as.array(matrix(input.mat, nrow=1, byrow=FALSE))
     intx <- sum(groupid)
