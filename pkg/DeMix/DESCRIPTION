@@ -10,7 +10,7 @@ Description: Implementation of a statistical method for deconvolving
   a priori), and an estimation of individualized expression profiles for both
   tumor and stromal tissues.
 Depends: R (>= 3.2), parallel
-Imports: utils, DSS
+Imports: stats, DSS
 Suggests: DeMixSampleData
 URL: http://r-forge.r-project.org/projects/demix
 License: Artistic-2.0
