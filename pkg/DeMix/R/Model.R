@@ -33,65 +33,90 @@ DeMix.model <- function(input,
                         ninteg,
                         ncore,
                         methods) {
+    ## Check arguments
+    stopifnot(is.matrix(input) && is.numeric(input[, 1]) && !anyNA(input))
+    stopifnot(is.numeric(nnormal) && length(nnormal) == 1 && nnormal >= 0)
+    stopifnot(is.numeric(ntumor)  && length(ntumor)  == 1 && ntumor  >= 0)
+    stopifnot(is.numeric(groupid) && !anyNA(groupid))
+# :PLRL: "nhavepi" seems logical, but numeric?
+    stopifnot(is.numeric(nhavepi) && length(nhavepi) == 1)
+# :PLR: Precondition checking incomplete...
+    stopifnot(is.numeric(ninteg) && length(ninteg) == 1)
+    stopifnot(is.numeric(ncore) && length(ncore) == 1)
+# :PLR: Precondition checking incomplete...
 
+    ## 
 
-input.norm <- DeMix.Normalization(input, method, groupid)
-input.filt <- DeMix.Filter(input.norm, nnormal,ntumor, groupid=c(rep(0,nnormal),rep(1,ntumor))
-
-
-    if(!is.matrix(inputmat1)) stop(sprintf("argument %s must be a matrix",
-                                           sQuote("inputmat1")))
-    if(!is.vector(groupid)) stop(sprintf("argument %s must be a vector",sQuote("groupid")))
+    input.norm <- DeMix.Normalization(input, method, groupid)
+    input.filt <- DeMix.Filter(input.norm,
+                               nnormal,
+                               ntumor,
+                               groupid=c(rep(0, nnormal), rep(1, ntumor))
+    input.mat <- input.filt
 
 seeds <- c(629555906, 921927245, 1265635378)
 
+    nsub <- as.integer(dim(input.mat)[2])
+    wgenes <- as.integer(dim(input.mat)[1])
 
+    input.arr <- as.array(matrix(input.mat, nrow=1, byrow=FALSE))
+    intx <- sum(groupid)
+    intn <- nsub - intx
 
-  nsub <- as.integer(dim(inputmat1)[2])
-  wgenes <- as.integer(dim(inputmat1)[1])
+    rnan <- input.mat[, groupid == 0] # 0 denotes normal cell
+    rnat <- input.mat[, groupid == 1] # 1 denotes tumor cell
+    ovsn <- ((apply(rnan,1,  sd)^2) - apply(rnan,1,  mean)+1) / (apply(rnan,1,  mean)+1)^2
+    ovst <- ((apply(rnat,1,  sd)^2) - apply(rnat,1,  mean)+1) / (apply(rnat,1,  mean)+1)^2
 
-  dataarray1 <- (as.array(matrix(inputmat1, nrow = 1, byrow = F)))
-  intx=sum(groupid);
-  intn=nsub-intx;
+    newovs <-c(abs(ovsn), abs(ovst))
 
-
-  rnan<-inputmat1[, groupid==0] # 0 denotes normal cell
-  rnat<-inputmat1[, groupid==1] # 1 denotes tumor cell
-  ovsn=((apply(rnan,1,  sd)^2)-apply(rnan,1,  mean)+1) / (apply(rnan,1,  mean)+1)^2
-  ovst=((apply(rnat,1,  sd)^2)-apply(rnat,1,  mean)+1) / (apply(rnat,1,  mean)+1)^2
-
-  newovs<-c(abs(ovsn), abs(ovst))
-
-    if(nhavepi==1){
-        if(!is.vector(givenpi)) stop("argument 5 must be a vector if pi is known");
-    givenpi=(as.array(givenpi))
+    if (nhavepi == 1) {
+        if (!is.vector(givenpi)) {
+             stop(sprintf("argument %s must be a numeric vector if pi is known",
+                          sQuote("givenpi")))
+        }
+        givenpi <- as.array(givenpi)
     } else {
-    givenpi=(as.array(rep(0, intx)))
-  }
+        givenpi <- as.array(rep(0, intx))
+    }
 
-    groupid<-(as.array(groupid))
+    groupid <- as.array(groupid)
 
-  if(ninteg<10) ninteg=10;
+    min.ninteg <- 10
+    if (ninteg < min.ninteg) {
+        ninteg <- min.ninteg
+    }
 
-    #dyn.load("main_firstparallel.so")
+    rres <- .C("Bdemix",
+               input.arr,
+               as.integer(ncore),
+               as.integer(groupid),
+               as.integer(nsub),
+               as.integer(wgenes),
+               as.integer(cbit),
+               as.integer(nhavepi),
+               givenpi,
+               as.integer(nPoi),
+               as.integer(ninteg),
+               newovs,
+               rep(0, intx*3),
+               rep(0, intx*3),
+               rep(0, nsub*wgenes),
+               rep(0, nsub*wgenes),
+               rep(0, 500*wgenes),
+               rep(0, 2*wgenes),
+               seeds)
 
-    rres <- .C("Bdemix", dataarray1, as.integer(ncore), as.integer(groupid), as.integer(nsub),
-                         as.integer(wgenes),  as.integer(cbit), as.integer(nhavepi ), givenpi,
-                         as.integer(nPoi), as.integer(ninteg), newovs, rep(0, intx*3), rep(0, intx*3),
-                         rep(0, nsub*wgenes), rep(0, nsub*wgenes), rep(0, 500*wgenes), rep(0, 2*wgenes),
-                         seeds)
+    outcome2 <- matrix(rres[[14]], ncol=nsub, nrow=wgenes, byrow=TRUE)
+    outcome2 <- outcome2[, ((intn+1):nsub)]
 
-    outcome2<-matrix(rres[[14]], ncol=(nsub) , nrow=wgenes, byrow = T)
+    outcome3 <- matrix(rres[[15]], ncol=nsub, nrow=wgenes, byrow=TRUE)
+    outcome3 <- outcome3[, ((intn+1):nsub)]
 
-  outcome2<-outcome2[, ((intn+1):nsub)];
-
-  outcome3<-matrix(rres[[15]], ncol=(nsub) , nrow=wgenes, byrow = T)
-  outcome3<-outcome3[, ((intn+1):nsub)];
-
-    outcome1<-matrix(rres[[12]], ncol=intx, nrow=3, byrow=T)
-  outcomePoi<-matrix(rres[[13]], ncol=intx, nrow=3, byrow=T)
-  post<-matrix(rres[[16]], ncol=500, nrow=wgenes, byrow = F)
-  mung<-matrix(rres[[17]], ncol=2, nrow=wgenes, byrow = F)
+    outcome1 <- matrix(rres[[12]], ncol=intx, nrow=3, byrow=TRUE)
+    outcomePoi <- matrix(rres[[13]], ncol=intx, nrow=3, byrow=TRUE)
+    post <- matrix(rres[[16]], ncol=500, nrow=wgenes, byrow=FALSE)
+    mung <- matrix(rres[[17]], ncol=2, nrow=wgenes, byrow=FALSE)
 
     list(pi=outcome1,
          Poipi=outcomePoi,
