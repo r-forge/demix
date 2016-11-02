@@ -14,12 +14,12 @@ DeMix.Filter <- function(newt,
 {
     ## Check arguments
     stopifnot(is.matrix(newt) && is.numeric(newt[, 1]) && !anyNA(newt))
-    stopifnot(is.numeric(nnormal) && length(nnormal) == 1 && nnormal >= 0)
-    stopifnot(is.numeric(ntumor)  && length(ntumor)  == 1 && ntumor  >= 0)
-    stopifnot(is.numeric(ntgroup) && !anyNA(ntgroup))
-    stopifnot(is.logical(zero_filter) && length(zero_filter) == 1)
-    stopifnot(is.numeric(conc) && length(conc) == 1)
-    stopifnot(is.numeric(fc) && length(fc) == 1)
+    stopifnot(is.numeric.scalar(nnormal) && nnormal >= 0)
+    stopifnot(is.numeric.scalar(ntumor)  && ntumor  >= 0)
+    stopifnot(is.numeric(ntgroup) && !anyNA(ntgroup) && length(ntgroup) >= 2)
+    stopifnot(is.logical.scalar(zero_filter))
+    stopifnot(is.numeric.scalar(conc))
+    stopifnot(is.numeric.scalar(fc))
 
     ## 0 denotes normal cell while 1 denote mixed tumor cell
     ## Filtering step 1.

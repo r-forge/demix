@@ -32,18 +32,21 @@ DeMix.model <- function(input,
                         givenpi,
                         ninteg,
                         ncore,
-                        methods) {
+                        method=c("total", "quantile", "median")) {
     ## Check arguments
     stopifnot(is.matrix(input) && is.numeric(input[, 1]) && !anyNA(input))
-    stopifnot(is.numeric(nnormal) && length(nnormal) == 1 && nnormal >= 0)
-    stopifnot(is.numeric(ntumor)  && length(ntumor)  == 1 && ntumor  >= 0)
-    stopifnot(is.numeric(groupid) && !anyNA(groupid))
+    stopifnot(is.numeric.scalar(nnormal) && nnormal >= 0)
+    stopifnot(is.numeric.scalar(ntumor)  && ntumor  >= 0)
+    stopifnot(is.numeric(groupid) && !anyNA(groupid) && length(groupid) >= 2)
 # :PLRL: "nhavepi" seems logical, but numeric?
-    stopifnot(is.numeric(nhavepi) && length(nhavepi) == 1)
-# :PLR: Precondition checking incomplete...
-    stopifnot(is.numeric(ninteg) && length(ninteg) == 1)
-    stopifnot(is.numeric(ncore) && length(ncore) == 1)
-# :PLR: Precondition checking incomplete...
+    stopifnot(is.numeric.scalar(nhavepi))
+# :PLR: Maybe default "givenpi" to null and check for that condition - eliminate "nhavepi" altogether
+# :PLR: Precondition checking missing... (givenpi)
+    stopifnot(is.numeric.scalar(ninteg))
+    stopifnot(is.numeric.scalar(ncore))
+    method <- match.arg(method)
+# :PLR: Arguments should be ordered by likelihood of needing to specify them
+
 
     ## 
 
