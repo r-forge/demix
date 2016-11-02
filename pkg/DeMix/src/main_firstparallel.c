@@ -21,16 +21,15 @@
 #include <pthread.h>
 #include <R.h>
 #include "bayes_para.h"
-//  R CMD SHLIB main_firstparallel.c
 
 
-// Newlly added for multiple thread
+// Newly added for multiple thread
 typedef struct threadInfoStruct {
   int offset;
   int opt;      // option
   unsigned long *seed;
   pthread_t threadId;
-} threadInfo;
+} threadInfo_t;
 int numThreads;
 
 //# 17 arguments (about a dozen too many)
@@ -51,7 +50,7 @@ void Bdemix(double *data,
             double *output32,
             double *output4,
             double *outputmu,
-            double* seedv)
+            double *seedv)
 {
   int i, j, k, l ,s, q;
   int iteration2=iteration;
@@ -71,9 +70,9 @@ void Bdemix(double *data,
   integ=*ninteg;
   nHavepi=*npi;
 
-  printf("starting DeMixbayes... \n");
+  Rprintf("starting DeMixbayes...\n");
 
-  // printf("Starting random number generator...\n");
+  // Rprintf("Starting random number generator...\n");
 
   // Random number read
   //seed = (unsigned long *)calloc(3,sizeof(unsigned long));
@@ -82,13 +81,12 @@ void Bdemix(double *data,
   //  fscanf(fseed,"%lu ",&(seed[i]));
   //}
   //fclose(fseed);
-
-  // printf("....done with random number generator setup\n");
   seed = (unsigned long *)calloc(3,sizeof(unsigned long));
   for (int i=0; i < 3; ++i) {
     seed[i] = seedv[i];
   }
 
+  // Rprintf("....done with random number generator setup\n");
 
   // If we have pi, we do not need to go lots of iterations.
   if(nHavepi==1)
@@ -104,12 +102,7 @@ void Bdemix(double *data,
 
   M = exp(-*ct*log(2.0));  /* for *ct bit machines/compilers */
 
-  printf(" ******************************************************************* \n");
-  printf(" *   DeMix-Bayes Version 1.01                                      * \n");
-  printf(" * Under %d bit computer machine with %d threads                   * \n", *ct, numThreads);
-  printf(" * The input data consist of %d subjects with %d genes          * \n", nS, nG);
-
-  p = (PARAM *)calloc(1,sizeof(PARAM));
+  p = (PARAM_t *)calloc(1, sizeof(PARAM_t));
 
   // Parameter initialized
   FD     =calloc(nS ,sizeof(double *));       // Where input data are saved
@@ -130,9 +123,15 @@ void Bdemix(double *data,
 
   initialSet(p);
   ReSet(p, newovs, seed);
-  load_data(data, nGroup, fixpi,  seed);
-  printf(" * A total of %d pure tissue and  %d mixed tissue samples        *  \n", fNorm,intx );
-  printf(" ******************************************************************* \n");
+  load_data(data, nGroup, fixpi, seed);
+
+  Rprintf(" ******************************************************************* \n");
+  Rprintf(" *   DeMix-Bayes Version 1.01                                      * \n");
+  Rprintf(" * Under %d bit computer machine with %d threads                   * \n", *ct, numThreads);
+  Rprintf(" * The input data consist of %d subjects with %d genes          * \n", nS, nG);
+
+  Rprintf(" * A total of %d pure tissue and  %d mixed tissue samples        *  \n", fNorm,intx );
+  Rprintf(" ******************************************************************* \n");
 
   icount=(int)((iteration2-burn)/10);
 
@@ -151,10 +150,10 @@ void Bdemix(double *data,
   */
 
   isave=0;
-  printf("Step 1: MCMC %d iteration will begin \n", iteration2);
+  Rprintf("Step 1: MCMC %d iteration will begin \n", iteration2);
   q=0;
   setnormalmean();
-  threadInfo *threads = (threadInfo*)calloc(numThreads,sizeof(threadInfo));
+  threadInfo_t *threads = (threadInfo_t *)calloc(numThreads, sizeof(threadInfo_t));
 
 
   for(i=0;i<iteration2;i++)
@@ -174,11 +173,10 @@ void Bdemix(double *data,
         }
         for(ii=0;ii<numThreads;++ii) {
           if(pthread_join(threads[ii].threadId, 0)!=0) {
-             perror("thread failure");
-             exit(-1);
-           }
+            Rf_error("thread join failure(1): ", strerror(errno));
+            /*NOTREACHED*/
+          }
         }
-
       } else {
         for(l=0;l<nS;l++)
           if(Dgroup[l]==1)
@@ -210,8 +208,8 @@ void Bdemix(double *data,
 
       for(ii=0;ii<numThreads;++ii) {
         if(pthread_join(threads[ii].threadId, 0)!=0) {
-          perror("thread failure");
-          exit(-1);
+          Rf_error("thread join failure(2): ", strerror(errno));
+          /*NOTREACHED*/
         }
       }
     }
@@ -219,7 +217,7 @@ void Bdemix(double *data,
     // Posteriors will be saved at every 10th iterations
     if(i%10==0 && i >10)
     {
-      printf("%d th iteration \n", i);
+      Rprintf("%d th iteration \n", i);
       if(nHavepi==0)
       {
         // Discard the samples before 'burn-in'
@@ -227,7 +225,7 @@ void Bdemix(double *data,
         {
           s=0;
 
-          /* This process is not necessary. Just give insigiht if Poisson distribution is used*/
+          /* This process is not necessary. Just give insight if Poisson distribution is used*/
           for(l=0;l<nS;l++)
           {
             if(Dgroup[l]==1 )
@@ -250,28 +248,28 @@ void Bdemix(double *data,
           if(Dgroup[l]==1 )
           {
             if(nPoi==0 || i<burn)
-              printf(" %15.3f \t",  p->pi[l]);
+              Rprintf(" %15.3f \t",  p->pi[l]);
             else
-              printf(" %15.3f \t",  like[l]);
+              Rprintf(" %15.3f \t",  like[l]);
           }
         }
-        printf("\n");
+        Rprintf("\n");
       }
     }
 
     // Expressions in the last 10 samples will be averaged
     if(i>iteration2-10)
     {
-      if(i==(iteration2-9)) printf("Step 2: Deconvolution starts\n");
+      // :PLR: Message displayed would seem incorrect (another Step 2 below)
+      if(i==(iteration2-9)) Rprintf("Step 2: Deconvolution starts\n");
       for(l=0;l<nG;l++)
       {
         for(k=0;k<nS;k++)
         {
           if(Dgroup[k]==1)
           {
-            CD[k][l][1] +=golden2(k, l, 1, MutliLike);
+            CD[k][l][1] += golden2(k, l, 1, MutliLike);
           }
-
         }
       }
     }
@@ -279,16 +277,17 @@ void Bdemix(double *data,
     if(i==10)
     {
       end_t=clock();
-      printf("================================================================\n");
-      printf("Total time : %lf hours\n", (double)(end_t-start_t)/CLOCKS_PER_SEC*((double)iteration2/numThreads/5.0/3600.0));
-      printf("================================================================\n");
+      Rprintf("================================================================\n");
+      Rprintf("Total time : %lf hours\n",
+              (double)(end_t-start_t)/CLOCKS_PER_SEC*((double)iteration2/numThreads/5.0/3600.0));
+      Rprintf("================================================================\n");
     }
   }
 
   // Given the mean/variance of normal and tumor, we optimize the deconvoled expression using the Golden
   // search algorithm, which is one-dimensional question.
 
-  printf("Step 2: Deconvolution starts\n");
+  Rprintf("Step 2: Deconvolution starts\n");
   for(l=0;l<nG;l++)
   {
     for(i=0;i<nS;i++)
@@ -298,12 +297,11 @@ void Bdemix(double *data,
         CD[i][l][1] = CD[i][l][1]/10.0;
         CD[i][l][0] = ((double)FD[i][l]- p->pi[i]*CD[i][l][1])/(1- p->pi[i]);
       }
-
     }
   }
   free(threads);
 
-  printf("Step 3: Output is being saved \n");
+  Rprintf("Step 3: Output is being saved \n");
 
   // Summarize the outcome
   minimax(tmppi, icount, intx, output1);
@@ -317,7 +315,7 @@ void Bdemix(double *data,
     outputmu[j*2]=  p->Navg[j];
     outputmu[j*2+1]=  p->Tavg[j];
   }
-  printf("Step 4: Saving outputs  : \n");
+  Rprintf("Step 4: Saving outputs  : \n");
 
   /*
 
@@ -333,7 +331,6 @@ void Bdemix(double *data,
   {
     free(tmppi[j]);
     free(tmppiPoi[j]);
-
   }
   free(tmppi);
   free(tmppiPoi);
@@ -343,9 +340,9 @@ void Bdemix(double *data,
 
 
 // Reading the expressions
-void load_data(double *mat1, int *group,  double *fixpi, unsigned long *seed)
+void load_data(double *mat1, int *group, double *fixpi, unsigned long *seed)
 {
-  int  j,k;
+  int j,k;
 
   for(k=0;k<nS;k++)
   {
@@ -362,22 +359,22 @@ void load_data(double *mat1, int *group,  double *fixpi, unsigned long *seed)
     Dgroup[j]=group[j];
     if(Dgroup[j]==0) fNorm++;
 
-    //printf("%d : %d \n", j, Dgroup[j]);
+    //Rprintf("%d : %d \n", j, Dgroup[j]);
   }
 
   // Determine the number of tumor sample
   intx=nS-fNorm;
 
-
   if(nHavepi==1)
   {
     for(k=0;k<intx;k++)
-      p->pi[fNorm+k]= fixpi[k];
+    {
+      p->pi[fNorm+k] = fixpi[k];
+    }
   }
-
 }
 
-void saveFiles( double *put3, double *put4)
+void saveFiles(double *put3, double *put4)
 {
   int i, j,k;
 
@@ -389,8 +386,8 @@ void saveFiles( double *put3, double *put4)
     {
       if(Dgroup[i]==1)
       {
-        put3[j*nS+k]=  CD[i][j][1];
-        put4[j*nS+k]=  CD[i][j][0];
+        put3[j*nS+k] = CD[i][j][1];
+        put4[j*nS+k] = CD[i][j][0];
       }
       k++;
     }
@@ -398,21 +395,21 @@ void saveFiles( double *put3, double *put4)
 }
 
 
-void initialSet(PARAM *qq)
+void initialSet(PARAM_t *qq)
 {
-  qq->Navg =calloc(nG ,sizeof(double ));
-  qq->Tavg =calloc(nG ,sizeof(double ));
-  qq->Favg =calloc(nG ,sizeof(double ));
+  qq->Navg = calloc(nG, sizeof(double));
+  qq->Tavg = calloc(nG, sizeof(double));
+  qq->Favg = calloc(nG, sizeof(double));
 
-  qq->Neta =calloc(nG ,sizeof(double ));
-  qq->Teta = calloc(nG ,sizeof(double ));
+  qq->Neta = calloc(nG, sizeof(double));
+  qq->Teta = calloc(nG, sizeof(double));
 
-  qq->pi =calloc(nS ,sizeof(double ));
+  qq->pi = calloc(nS, sizeof(double));
 }
 
 
 // Setting the initial values of all parameters
-void ReSet(PARAM *qq, double *obs, unsigned long *seed)
+void ReSet(PARAM_t *qq, double *obs, unsigned long *seed)
 {
   int i, j;
   for(j=0;j<nG;j++)
@@ -422,7 +419,6 @@ void ReSet(PARAM *qq, double *obs, unsigned long *seed)
 
     qq->Neta[j]=obs[j];
     qq->Teta[j]=obs[j+nG];
-
   }
 
   if(nHavepi==0)
@@ -556,7 +552,7 @@ long double NB_nt3(double yt, double xt, int samp, int genes)
   tmpn+=1.0/p->Teta[genes]*log(1.0/(1+tmpy));
   tmpn+=yt*log(tmpy/(1+tmpy));
 
-  if(tmpn>700) printf("Warning : %lf  \n",tmpn);
+  if(tmpn>700) Rf_warning("Warning: ", tmpn, "\n");
 
   return exp(tmpn);
 }
@@ -578,7 +574,7 @@ long double Poisson_nt3(double yt, double xt, int samp, int genes)
   tmpn+=xt *log(p->Navg[genes])  + p->Navg[genes] - log(xt*(1-p->pi[samp]) );
   tmpn+=yt *log(p->Tavg[genes])  + p->Tavg[genes] - log(yt*(p->pi[samp]) );
 
-  if(tmpn>700) printf("Warning : %lf  \n",tmpn);
+  if(tmpn>700) Rf_warning("Warning: ", tmpn, "\n");
 
   return exp(tmpn);
 }
@@ -632,7 +628,7 @@ void getnormal(int genes, int opt, unsigned long *seed)   // opt 0 for Mu_n, 1 f
   {
     for(i=0;i<nS;i++)
     {
-      //printf("%d \t %d : %lf \t %lf \t  %lf \t %lf  \t %lf  \n", genes, i, NIG[i][genes], FD[i][genes], nig, tig, p->pi[i]);
+      //Rprintf("%d \t %d : %lf \t %lf \t  %lf \t %lf  \t %lf  \n", genes, i, NIG[i][genes], FD[i][genes], nig, tig, p->pi[i]);
       if(Dgroup[i]==0)
       {
         /*
@@ -720,7 +716,7 @@ void getnormal(int genes, int opt, unsigned long *seed)   // opt 0 for Mu_n, 1 f
 
 
 void* gettumor_parallel(void* args) {
-  threadInfo *info = (threadInfo*)args;
+  threadInfo_t *info = (threadInfo_t *)args;
   int offset = info->offset;
   int nstart, nend, nsect;
 
@@ -733,7 +729,7 @@ void* gettumor_parallel(void* args) {
   if(offset==(numThreads-1))
     nend=nG;
 
-  //printf("%d : %d  \t %d \n",info->opt, nstart, nend );
+  //Rprintf("%d : %d  \t %d \n",info->opt, nstart, nend );
   for(l=nstart;l<nend;l++)
   {
       gettumor(l, info->opt, info->seed)   ;
@@ -742,7 +738,7 @@ void* gettumor_parallel(void* args) {
 }
 
 void* getnormal_parallel(void* args) {
-  threadInfo *info = (threadInfo*)args;
+  threadInfo_t *info = (threadInfo_t *)args;
   int offset = info->offset;
   int nstart, nend, nsect;
 
@@ -864,7 +860,7 @@ void gettumor(int genes, int opt, unsigned long *seed)    // opt 0 for Mu_n, 1 f
 }
 
 void* getpi2_parallel(void* args) {
-  threadInfo *info = (threadInfo*)args;
+  threadInfo_t *info = (threadInfo_t *)args;
   int offset = info->offset;
   int l;
   for(l=0;l<nS;l++)
@@ -947,10 +943,10 @@ double getpi2(int samp,  unsigned long *seed)   // opt 0 for Mu_n, 1 for sigma_n
   }
 
   if(isnan(new_like)== 1.0)
-    printf("%d error %lf \n", samp, p->pi[samp]);
+    Rprintf("%d error %lf \n", samp, p->pi[samp]);
 
   if(isnan(old_like)== 1.0)
-  printf("%d error %lf \n", samp, p->pi[samp]);
+    Rprintf("%d error %lf \n", samp, p->pi[samp]);
 
   if((ncnt > 1.25*(ocnt+0.5)) || (log(kiss(seed))<new_like-old_like))
   {

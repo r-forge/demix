@@ -2,8 +2,13 @@
  * $Id$
  */
 
+// :PLR: This needs to be broken up. Implementation belongs in ".c" file!
+
+
 #ifndef _Jaeil_H
 #define _Jaeil_H
+
+#include <R.h>
 
 #define iteration 1500
 #define burn 1000
@@ -14,23 +19,21 @@
 
 // parameter definition
 typedef struct param{
-	double *Navg;
-	double *Tavg;
-  double *Favg;
-	double *Nsigma;
-	double *Tsigma;
-	
-	double *Neta;
-	double *Teta;
-	double *pi;
-	
-} PARAM;
+    double *Navg;
+    double *Tavg;
+    double *Favg;
+    double *Nsigma;
+    double *Tsigma;
+    double *Neta;
+    double *Teta;
+    double *pi;
+} PARAM_t;
 
 
 
 // Function initialize
-void initialSet(PARAM *qq);
-void ReSet(PARAM *qq, double *obs, unsigned long *seed);
+void initialSet(PARAM_t *qq);
+void ReSet(PARAM_t *qq, double *obs, unsigned long *seed);
 void load_data(double *mat1, int *group,  double *fixpi, unsigned long *seed);
 void saveFiles( double *put3, double *put4);
 void minimax(double **mat, int nrow, int ncol, double *rtmat);
@@ -108,9 +111,10 @@ double gamma(double xx);
 double factln(int n);
 double factrl(int n);
 
+// :PLR: Are these supposed to be global or module variables?
 
-// Variable allocation, arguements for paramters
-PARAM *p;
+// Variable allocation, arguments for parameters
+PARAM_t *p;
 double **FD, ***CD, **NIG, *minG, *fake;
 int *Dgroup;
 int nUseO,nG, nS, nPer, WG,nVar, nLog, nSave, nPoi, nHavepi;
@@ -197,7 +201,7 @@ double factrl(int n)
 	}
 	
 	
-	if (n < 0 || n>170 ) printf("Negative factorial %d in routine factrl \n", n);
+	if (n < 0 || n>170 ) Rf_warning("Negative factorial %d in routine factrl \n", n);
 	return a[n];
 }
 
@@ -779,7 +783,7 @@ double snorm2(unsigned long *seed)
 		return (snorm);
 	}
 	else { //start center
-//		printf("center ");
+//		Rprintf("center ");
 		ustar = u-(double)i;
 		aa = *(a+i-1);
 		while (ustar <= *(t+i-1)) {
