@@ -25,7 +25,7 @@ DeMix.Filter(data=newt, ntgroup=c(0, 0, 1), zero_filter=TRUE, conc=0.8, fc=1.2)
     where \code{0} represents healthy and \code{1} represents tumor samples}
   \item{zero_filter}{logical scalar. If \code{TRUE}, uses the screening based on    zero counts.}
   \item{conc}{numeric scalar cut-off value used for checking the linearity
-    assumption. More than 0.8 or 80% is recommended.}
+    assumption. More than 0.8 or 80\% is recommended.}
   \item{fc}{numeric scalar fold-change cut-off value used for identifying
     informative genes in proportion estimations. 1.2 or 1/1.2 is default.
     This value needs to be set for reducing data-size. Approximately
