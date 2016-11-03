@@ -12,7 +12,6 @@
     Package: \tab \Sexpr[results=text]{packageDescription("DeMix")$Package}\cr
     Type:    \tab Package\cr
     Version: \tab \Sexpr[results=text]{packageDescription("DeMix")$Version}\cr
-    Phase:   \tab \Sexpr[results=text]{packageDescription("DeMix")$Phase}\cr
     Date:    \tab \Sexpr[results=text]{packageDescription("DeMix")$Date}\cr
     License: \tab \Sexpr[results=text]{packageDescription("DeMix")$License}\cr
   }
