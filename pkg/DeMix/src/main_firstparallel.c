@@ -19,6 +19,7 @@
 #include <time.h>
 #include <errno.h>
 #include <pthread.h>
+#include <assert.h>
 #include <R.h>
 #include "bayes_para.h"
 
@@ -70,6 +71,9 @@ void Bdemix(double *data,
   integ=*ninteg;
   nHavepi=*npi;
 
+  assert(*ct == 32 || *ct == 64);
+
+
   Rprintf("starting DeMixbayes...\n");
 
   // Rprintf("Starting random number generator...\n");
@@ -91,13 +95,13 @@ void Bdemix(double *data,
   // If we have pi, we do not need to go lots of iterations.
   if(nHavepi==1)
   {
-    iteration2=500;
-    burn2=490;
+    iteration2 = 500;
+    burn2 = 490;
     // Average of the last ten iterations will be used for deconvolved expressions
   }
   else
   {
-    iteration2=iteration;
+    iteration2 = iteration;
   }
 
   M = exp(-*ct*log(2.0));  /* for *ct bit machines/compilers */
@@ -105,20 +109,20 @@ void Bdemix(double *data,
   p = (PARAM_t *)calloc(1, sizeof(PARAM_t));
 
   // Parameter initialized
-  FD     =calloc(nS ,sizeof(double *));       // Where input data are saved
-  CD     =calloc(nS ,sizeof(double **));       // Where output data are saved after deconvolution
+  FD     = calloc(nS, sizeof(double *));       // Where input data are saved
+  CD     = calloc(nS, sizeof(double **));       // Where output data are saved after deconvolution
   tmp_pos= calloc(integ, sizeof(double ));
-  like     =calloc(nS ,sizeof(double));       // Liklihood values corresponding to each sample
-  Dgroup   =calloc(nS ,sizeof(int));          // Where group ID is save, 1 for tumor 0 for normal
-  fake     =calloc(nG ,sizeof(double));
+  like   = calloc(nS, sizeof(double));       // Liklihood values corresponding to each sample
+  Dgroup = calloc(nS, sizeof(int));          // Where group ID is save, 1 for tumor 0 for normal
+  fake   = calloc(nG, sizeof(double));
 
   for(j=0;j<nS;j++)
   {
-    FD[j]= calloc(nG, sizeof(double ));
-    CD[j]= calloc(nG, sizeof(double  *));
+    FD[j] = calloc(nG, sizeof(double ));
+    CD[j] = calloc(nG, sizeof(double  *));
 
     for(k=0;k<nG;k++)
-      CD[j][k]=calloc(2, sizeof(double));
+      CD[j][k] = calloc(2, sizeof(double));
   }
 
   initialSet(p);
