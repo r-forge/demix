@@ -4,20 +4,15 @@
 
 ##-----------------------------------------------------------------------------
 DeMix.Filter <- function(newt,
-                         nnormal,
-                         ntumor,
-                         ntgroup=c(rep(0, nnormal),
-                                   rep(1, ntumor)),
-                         zero_filter=TRUE,
+                         design,
+                         zerofilter=TRUE,
                          conc=0.8,
                          fc=1.2)
 {
     ## Check arguments
     stopifnot(is.matrix(newt) && is.numeric(newt[, 1]) && !anyNA(newt))
-    stopifnot(is.scalar.numeric(nnormal) && nnormal >= 0)
-    stopifnot(is.scalar.numeric(ntumor)  && ntumor  >= 0)
-    stopifnot(is.numeric(ntgroup) && !anyNA(ntgroup) && length(ntgroup) >= 2)
-    stopifnot(is.scalar.logical(zero_filter))
+    stopifnot(is.numeric(design) && !anyNA(design) && length(design) >= 2)
+    stopifnot(is.scalar.logical(zerofilter))
     stopifnot(is.scalar.numeric(conc))
     stopifnot(is.scalar.numeric(fc))
 
@@ -27,16 +22,16 @@ DeMix.Filter <- function(newt,
     ## Don't use genes with count 0.
     genes.withoutzero <- apply(newt, 1, min) > 0
   
-    if (zero_filter) {
-        ## :PLR: Which means "ntgroup" will no longer correspond to "newt" cols
+    if (zerofilter) {
+        ## :PLR: Which means "design" will no longer correspond to "newt" cols
         RNA <- newt[genes.withoutzero == TRUE, ]
     }
 
     ## Filtering step 2
     ## Identify genes that satisfy the linearity assumption with more than
     ## conc% probability for both up-regulated or down-regulated genes in tumor.
-    Nsam <- RNA[, ntgroup == 0]
-    Tsam <- RNA[, ntgroup == 1]
+    Nsam <- RNA[, design == 0]
+    Tsam <- RNA[, design == 1]
 
 ## :PLR: apply(x, 1, mean) can be rewritten as rowMeans(x)
 
@@ -50,7 +45,7 @@ DeMix.Filter <- function(newt,
         Cons[i] <- sum(Tsam[i, ] > Nmean[i])
         Nega[i] <- sum(Tsam[i, ] < Nmean[i])
     }
-    cutoff_con <- round(sum(ntgroup == 1) * conc)
+    cutoff_con <- round(sum(design == 1) * conc)
 
     ## Filtering step 3
     ## Default fold-change is set at 1.2 and 1/1.2

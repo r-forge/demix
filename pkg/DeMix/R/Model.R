@@ -9,7 +9,7 @@
 # inputmat1 : matrix after RMA normalization.  G*S matrix
 # where G is the number of genes and S is the number of samples.
 #
-# groupid : vector of indicators whether the sample is mixed or not.
+# design : vector of indicators whether the sample is mixed or not.
 # For matched 6 samples ex c(0,1,0,1, 0, 1)
 #
 # cit=64  which tells the bit of the machine. it can be 32 bit for some machines
@@ -18,26 +18,21 @@
 # nref : if we have reference genes, just indicate the row numbers of those genes.
 # #####################################################################
 
-# inputmat1=as.matrix(inputmat1);groupid=cnvgroup; nhavepi= 1; givenpi=as.vector(testr2$pi[1,]) ;
+# inputmat1=as.matrix(inputmat1);design=cnvgroup; nhavepi= 1; givenpi=as.vector(testr2$pi[1,]) ;
 #nPoi= 1;ninteg= 28
 
 
 ##-----------------------------------------------------------------------------
 DeMix.model <- function(input,
-                        nnormal,
-                        ntumor,
-                        groupid=c(rep(0, nnormal),
-                                  rep(1, ntumor)),
+                        design,
+                        method=c("total", "quantile", "median"),
                         nhavepi,
                         givenpi,
                         ninteg,
-                        ncore,
-                        method=c("total", "quantile", "median")) {
+                        ncore=detectCores()) {
     ## Check arguments
     stopifnot(is.matrix(input) && is.numeric(input[, 1]) && !anyNA(input))
-    stopifnot(is.scalar.numeric(nnormal) && nnormal >= 0)
-    stopifnot(is.scalar.numeric(ntumor)  && ntumor  >= 0)
-    stopifnot(is.numeric(groupid) && !anyNA(groupid) && length(groupid) >= 2)
+    stopifnot(is.numeric(design) && !anyNA(design) && length(design) >= 2)
 # :PLRL: "nhavepi" seems logical, but numeric?
     stopifnot(is.scalar.numeric(nhavepi))
 # :PLR: Maybe default "givenpi" to null and check for that condition - eliminate "nhavepi" altogether
@@ -50,11 +45,8 @@ DeMix.model <- function(input,
 
     ## 
 
-    input.norm <- DeMix.Normalization(input, groupid, method)
-    input.mat  <- DeMix.Filter(input.norm,
-                               nnormal,
-                               ntumor,
-                               groupid=c(rep(0, nnormal), rep(1, ntumor)))
+    input.norm <- DeMix.Normalization(input, design, method)
+    input.mat  <- DeMix.Filter(input.norm, design)
 
 seeds <- c(629555906, 921927245, 1265635378)
 
@@ -62,11 +54,11 @@ seeds <- c(629555906, 921927245, 1265635378)
     wgenes <- nrow(input.mat)
 
     input.arr <- as.array(matrix(input.mat, nrow=1, byrow=FALSE))
-    intx <- sum(groupid)
+    intx <- sum(design)
     intn <- nsub - intx
 
-    rnan <- input.mat[, groupid == 0] # 0 denotes normal cell
-    rnat <- input.mat[, groupid == 1] # 1 denotes tumor cell
+    rnan <- input.mat[, design == 0] # 0 denotes normal cell
+    rnat <- input.mat[, design == 1] # 1 denotes tumor cell
     ovsn <- ((apply(rnan,1,  sd)^2) - apply(rnan,1,  mean)+1) / (apply(rnan,1,  mean)+1)^2
     ovst <- ((apply(rnat,1,  sd)^2) - apply(rnat,1,  mean)+1) / (apply(rnat,1,  mean)+1)^2
 
@@ -82,7 +74,7 @@ seeds <- c(629555906, 921927245, 1265635378)
         givenpi <- as.array(rep(0, intx))
     }
 
-    groupid <- as.array(groupid)
+    design <- as.array(design)
 
     min.ninteg <- 10
     if (ninteg < min.ninteg) {
@@ -97,7 +89,7 @@ seeds <- c(629555906, 921927245, 1265635378)
     rres <- .C("Bdemix",
                input.arr,
                as.integer(ncore),
-               as.integer(groupid),
+               as.integer(design),
                as.integer(nsub),
                as.integer(wgenes),
                as.integer(cbit),

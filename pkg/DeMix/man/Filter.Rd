@@ -15,15 +15,15 @@
   }
 }
 \usage{
-DeMix.Filter(data=newt, ntgroup=c(0, 0, 1), zero_filter=TRUE, conc=0.8, fc=1.2)
+DeMix.Filter(input, design, zerofilter=TRUE, conc=0.8, fc=1.2)
 }
 \arguments{
-  \item{data}{numeric matrix of gene expressions after normalization.
+  \item{input}{numeric matrix of gene expressions after normalization.
     The \code{G*S} matrix where \code{G} is the number of genes and
     \code{S} is the number of samples.}
-  \item{ntgroup}{integer vector of \code{S} length specifying tissue components,
+  \item{design}{integer vector of \code{S} length specifying tissue components,
     where \code{0} represents healthy and \code{1} represents tumor samples}
-  \item{zero_filter}{logical scalar. If \code{TRUE}, uses the screening based on    zero counts.}
+  \item{zerofilter}{logical scalar. If \code{TRUE}, uses the screening based on    zero counts.}
   \item{conc}{numeric scalar cut-off value used for checking the linearity
     assumption. More than 0.8 or 80\% is recommended.}
   \item{fc}{numeric scalar fold-change cut-off value used for identifying
@@ -41,12 +41,8 @@ data(ntot_NT_Liver)
 
 # First 50 samples normal, remaining 151 tumor for this dataset
 input.mat <- ntot_NT_Liver
-grouping <- c(rep(0, 50),
-              rep(1, 151))
-filtered.mat <- DeMix::DeMix.Filter(input.mat,
-                                    grouping,
-                                    zero_filter=TRUE,
-                                    conc=0.8,
-                                    fc=1.2)
+design <- c(rep(0, 50),
+            rep(1, 151))
+filtered.mat <- DeMix::DeMix.Filter(input.mat, design)
 }
 
