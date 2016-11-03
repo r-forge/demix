@@ -89,6 +89,11 @@ seeds <- c(629555906, 921927245, 1265635378)
         ninteg <- min.ninteg
     }
 
+    cbit <- as.integer(64)   # :TODO: What does this param actually mean
+                             # :TODO: Remove from Bdemix()?
+    nPoi <- as.integer(1)    # :TODO: What is 'nPoi' param for?
+                             # :TODO: Remove from Bdemix()?
+
     rres <- .C("Bdemix",
                input.arr,
                as.integer(ncore),
