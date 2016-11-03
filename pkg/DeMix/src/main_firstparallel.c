@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>
@@ -39,7 +40,6 @@ void Bdemix(double *data,
             int *nGroup,
             int *nsamp,
             int *ngenes,
-            int *ct,
             int *npi,
             double *fixpi,
             int *nmodel,
@@ -71,8 +71,9 @@ void Bdemix(double *data,
   integ=*ninteg;
   nHavepi=*npi;
 
+  int arch = sizeof(int*) * CHAR_BIT;
+  const int *ct = &arch;
   assert(*ct == 32 || *ct == 64);
-
 
   Rprintf("starting DeMixbayes...\n");
 
