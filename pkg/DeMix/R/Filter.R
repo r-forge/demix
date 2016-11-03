@@ -3,14 +3,16 @@
 ###
 
 ##-----------------------------------------------------------------------------
-DeMix.Filter <- function(newt,
+DeMix.Filter <- function(input.mat,
                          design,
                          zerofilter=TRUE,
                          conc=0.8,
                          fc=1.2)
 {
     ## Check arguments
-    stopifnot(is.matrix(newt) && is.numeric(newt[, 1]) && !anyNA(newt))
+    stopifnot(is.matrix(input.mat) &&
+              is.numeric(input.mat[, 1]) &&
+              !anyNA(input.mat))
     stopifnot(is.numeric(design) && !anyNA(design) && length(design) >= 2)
     stopifnot(is.scalar.logical(zerofilter))
     stopifnot(is.scalar.numeric(conc))
@@ -20,11 +22,11 @@ DeMix.Filter <- function(newt,
     ## Filtering step 1.
     ## Input data are previously normalized at the data processing stage
     ## Don't use genes with count 0.
-    genes.withoutzero <- apply(newt, 1, min) > 0
+    genes.withoutzero <- apply(input.mat, 1, min) > 0
   
     if (zerofilter) {
-        ## :PLR: Which means "design" will no longer correspond to "newt" cols
-        RNA <- newt[genes.withoutzero == TRUE, ]
+        ## :PLR: Which means "design" will no longer correspond to "input.mat" cols
+        RNA <- input.mat[genes.withoutzero == TRUE, ]
     }
 
     ## Filtering step 2

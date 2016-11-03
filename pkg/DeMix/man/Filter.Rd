@@ -15,10 +15,10 @@
   }
 }
 \usage{
-DeMix.Filter(input, design, zerofilter=TRUE, conc=0.8, fc=1.2)
+DeMix.Filter(input.mat, design, zerofilter=TRUE, conc=0.8, fc=1.2)
 }
 \arguments{
-  \item{input}{numeric matrix of gene expressions after normalization.
+  \item{input.mat}{numeric matrix of gene expressions after normalization.
     The \code{G*S} matrix where \code{G} is the number of genes and
     \code{S} is the number of samples.}
   \item{design}{integer vector of \code{S} length specifying tissue components,
