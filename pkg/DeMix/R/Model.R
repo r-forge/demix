@@ -50,7 +50,7 @@ DeMix.model <- function(input,
 
     ## 
 
-    input.norm <- DeMix.Normalization(input, method, groupid)
+    input.norm <- DeMix.Normalization(input, groupid, method)
     input.mat  <- DeMix.Filter(input.norm,
                                nnormal,
                                ntumor,
