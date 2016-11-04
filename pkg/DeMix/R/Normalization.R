@@ -24,7 +24,7 @@ DeMix.Normalization <- function(input,
     ## 0 denotes normal cell / 1 denotes tumor cell
     seqData <- DSS::newSeqCountSet(input.mat, design)
 
-    ## Quantile normalization
+    ## Determine normalization factor
     seqData <- DSS::estNormFactors(seqData, method)
     k3 <- seqData@normalizationFactor
     k3.median <- median(k3)
