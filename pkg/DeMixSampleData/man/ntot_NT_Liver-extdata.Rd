@@ -8,7 +8,7 @@
   This dataset consists of a matrix of gene expressions after the RMA
   normalization, which includes 211 samples (the first 50 samples are
   normal controls, and the remaining 161 are tumor mixed samples).
-  It is available from ref [1].}
+  It is available from ref [1].
 }
 \references{
   [1]
