@@ -45,22 +45,20 @@ DeMix.model <- function(input,
 
     ## 
 
-    input.norm <- DeMix.Normalization(input, design, method)
-    input.mat  <- DeMix.Filter(input.norm, design)
+    norm.mat <- DeMix.Normalization(input, design, method)
+    filtered.mat  <- DeMix.Filter(norm.mat, design)
 
-seeds <- c(629555906, 921927245, 1265635378)
+    nsub   <- ncol(filtered.mat)
+    ngenes <- nrow(filtered.mat)
 
-    nsub   <- ncol(input.mat)
-    wgenes <- nrow(input.mat)
+    input.arr <- as.array(matrix(filtered.mat, nrow=1, byrow=FALSE))
+    ntumor <- sum(design)
+    nnormal <- nsub - ntumor
 
-    input.arr <- as.array(matrix(input.mat, nrow=1, byrow=FALSE))
-    intx <- sum(design)
-    intn <- nsub - intx
-
-    rnan <- input.mat[, design == 0] # 0 denotes normal cell
-    rnat <- input.mat[, design == 1] # 1 denotes tumor cell
-    ovsn <- ((apply(rnan,1,  sd)^2) - apply(rnan,1,  mean)+1) / (apply(rnan,1,  mean)+1)^2
-    ovst <- ((apply(rnat,1,  sd)^2) - apply(rnat,1,  mean)+1) / (apply(rnat,1,  mean)+1)^2
+    rnan <- filtered.mat[, design == 0] # 0 denotes normal cell
+    rnat <- filtered.mat[, design == 1] # 1 denotes tumor cell
+    ovsn <- ((apply(rnan, 1, sd)^2) - apply(rnan, 1, mean)+1) / (apply(rnan, 1, mean)+1)^2
+    ovst <- ((apply(rnat, 1, sd)^2) - apply(rnat, 1, mean)+1) / (apply(rnat, 1, mean)+1)^2
 
     newovs <-c(abs(ovsn), abs(ovst))
 
@@ -71,7 +69,7 @@ seeds <- c(629555906, 921927245, 1265635378)
         }
         givenpi <- as.array(givenpi)
     } else {
-        givenpi <- as.array(rep(0, intx))
+        givenpi <- as.array(rep(0, ntumor))
     }
 
     design <- as.array(design)
@@ -83,36 +81,38 @@ seeds <- c(629555906, 921927245, 1265635378)
 
     nPoi <- as.integer(1)    # :TODO: What is 'nPoi' param for?
                              # :TODO: Remove from Bdemix()?
+    seeds <- c(629555906, 921927245, 1265635378)
+
 
     rres <- .C("Bdemix",
                input.arr,
                as.integer(ncore),
                as.integer(design),
                as.integer(nsub),
-               as.integer(wgenes),
+               as.integer(ngenes),
                as.integer(nhavepi),
                givenpi,
                as.integer(nPoi),
                as.integer(ninteg),
                newovs,
-               rep(0, intx*3),
-               rep(0, intx*3),
-               rep(0, nsub*wgenes),
-               rep(0, nsub*wgenes),
-               rep(0, 500*wgenes),
-               rep(0, 2*wgenes),
+               rep(0, ntumor*3),
+               rep(0, ntumor*3),
+               rep(0, nsub*ngenes),
+               rep(0, nsub*ngenes),
+               rep(0, 500*ngenes),
+               rep(0, 2*ngenes),
                seeds)
 
-    outcome2 <- matrix(rres[[14]], ncol=nsub, nrow=wgenes, byrow=TRUE)
-    outcome2 <- outcome2[, ((intn+1):nsub)]
+    outcome2 <- matrix(rres[[14]], ncol=nsub, nrow=ngenes, byrow=TRUE)
+    outcome2 <- outcome2[, ((nnormal+1):nsub)]
 
-    outcome3 <- matrix(rres[[15]], ncol=nsub, nrow=wgenes, byrow=TRUE)
-    outcome3 <- outcome3[, ((intn+1):nsub)]
+    outcome3 <- matrix(rres[[15]], ncol=nsub, nrow=ngenes, byrow=TRUE)
+    outcome3 <- outcome3[, ((nnormal+1):nsub)]
 
-    outcome1 <- matrix(rres[[12]], ncol=intx, nrow=3, byrow=TRUE)
-    outcomePoi <- matrix(rres[[13]], ncol=intx, nrow=3, byrow=TRUE)
-    post <- matrix(rres[[16]], ncol=500, nrow=wgenes, byrow=FALSE)
-    mung <- matrix(rres[[17]], ncol=2, nrow=wgenes, byrow=FALSE)
+    outcome1 <- matrix(rres[[12]], ncol=ntumor, nrow=3, byrow=TRUE)
+    outcomePoi <- matrix(rres[[13]], ncol=ntumor, nrow=3, byrow=TRUE)
+    post <- matrix(rres[[16]], ncol=500, nrow=ngenes, byrow=FALSE)
+    mung <- matrix(rres[[17]], ncol=2, nrow=ngenes, byrow=FALSE)
 
     list(pi=outcome1,
          Poipi=outcomePoi,
