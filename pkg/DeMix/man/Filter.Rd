@@ -40,9 +40,9 @@ DeMix.Filter(input.mat, design, zerofilter=TRUE, conc=0.8, fc=1.2)
 data(ntot_NT_Liver)
 
 # First 50 samples normal, remaining 151 tumor for this dataset
-input.mat <- ntot_NT_Liver
+input.mat <- as.matrix(ntot_NT_Liver.df)
 design <- c(rep(0, 50),
             rep(1, 151))
-filtered.mat <- DeMix::DeMix.Filter(input.mat, design)
+filtered.mat <- DeMix:::DeMix.Filter(input.mat, design)
 }
 

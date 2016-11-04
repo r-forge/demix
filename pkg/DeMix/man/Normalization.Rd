@@ -43,9 +43,9 @@ DeMix.Normalization(input,
 }
 \examples{
 data(ntot_NT_Liver)
-input <- ntot_NT_Liver
+input <- ntot_NT_Liver.df
 design <- c(rep(0, 60), rep(1, 151))   # 60 normal, then 151 tumor samples
-input.norm <- DeMix.Normalization(input, design, method="quantile")
+input.norm <- DeMix:::DeMix.Normalization(input, design, method="quantile")
 }
 \keyword{Normalization}
 
