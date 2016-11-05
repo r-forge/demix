@@ -1,7 +1,7 @@
 Package: DeMix
 Title: Deconvolution Models for Mixed Transcriptomes from Heterogeneous Tumor Samples
 Version: 0.2.0
-Date: 2016-11-01
+Date: 2016-11-04
 Author: Jaeil Ahn
 Maintainer: "Jaeil Ahn" <ja1030@georgetown.edu>
 Description: Implementation of a statistical method for deconvolving
