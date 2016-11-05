@@ -1,0 +1,48 @@
+/*
+ * $Id$ 
+ * CSS for the DeMix homepage (page-specific)
+ */
+
+div.screen::before {
+  background-color: blue;
+  border: thin solid grey;
+  color: white;
+  font: bold small sans-serif;
+  left: 1em;
+  line-height: 1em;
+  padding: 0.1em;
+  position: absolute;
+  text-align: center;
+  top: -0.6em;
+  width: 7.5em;
+}
+
+div.screen {
+  border: thin solid grey;
+  margin: 0px 50px;
+  padding: 0.5em;
+  page-break-inside: avoid;
+  position: relative;
+}
+
+div.screen .prompt {
+  font-weight: bold;
+}
+
+div.screen .prompt::after {
+  content: "\00a0";
+}
+
+div.session::before {
+  content: "R";
+}
+
+div.session {
+  background-color: rgb(90%,90%,90%);
+  color: green;
+}
+
+div.session kbd, div.session .cursor {
+  color: blue;
+}
+

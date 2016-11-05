@@ -7,36 +7,24 @@
   <meta charset="utf-8" />
   <title>R-Forge: DeMix: Home</title>
   <link rel="stylesheet"
-        type="text/css"
-        href="http://r-forge.r-project.org/themes/rforge/styles/estilo1.css" />
-  <style>
-.reference {
-  font-size: smaller;
-}
-
-.authorgroup {
-  display: inline;
-}
-
-.author {
-  font-weight: bold;
-}
-
-.title .article {
-  font-style: italic;
-}
-  </style>
+        href="css/site.css" />
+  <link rel="stylesheet"
+        href="css/index.css" />
 </head>
 <body>
   <header>
     <a href="http://r-forge.r-project.org/">
       <img src="http://r-forge.r-project.org/themes/rforge//imagesrf/logo.png"
-           border="0"
+           class="rforge-logo"
            alt="R-Forge Logo" />
     </a>
+    <h1>DeMix</h1>
+    <hr>
   </header>
 
   <main class="content" role="main">
+
+    <h2>Overview</h2>
     <p>
       Tumor samples consisting of both cancer and stromal tissues are a major
       cause of under-detection of gene expression biomarkers for cancer
@@ -50,6 +38,22 @@
       gene expressions of normal and tumor samples. 
     </p>
 
+    <h2>Installation</h2>
+    <div class="install">
+      <p>
+        From within an <span class="software">R</span> session, type the following:
+      </p>
+
+      <div class="session screen">
+      <pre><samp>
+<span class="prompt unselectable">R&gt;</span><kbd>source("http://bioconductor.org/biocLite.R")</kbd>
+<span class="prompt unselectable">R&gt;</span><kbd>biocLite("DSS", dependencies=TRUE)</kbd>
+<span class="prompt unselectable">R&gt;</span><kbd>install.packages("DeMix", repos="http://r-forge.r-project.org", dependencies=TRUE)</kbd>
+      </samp></pre>
+      </div>
+    </div>
+
+    <h2>Reference</h2>
     <div class="reference">
       <div class="articleinfo">
         <div class="authorgroup">
@@ -97,13 +101,16 @@
         </a><br />
       </div>
     </div>
+  </main>
 
+  <hr>
+  <footer>
     <p>
       Click
       <a href="http://r-forge.r-project.org/projects/demix/">
       <strong>here</strong></a> for the R-Forge <strong>project summary page</strong>.
     </p>
-  </main>
+  </footer>
 </body>
 </html>
 

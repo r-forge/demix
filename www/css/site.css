@@ -1,0 +1,41 @@
+/* 
+ * $Id$
+ * CSS for the DeMix website (global)
+ */
+
+.reference {
+  font-size: smaller;
+}     
+      
+.authorgroup {
+  display: inline;
+}     
+      
+.author {
+  font-weight: bold;
+}   
+
+.title .article {
+  font-style: italic;
+}       
+
+span.software, span.package, span.repository {
+  font-weight: bold;
+}
+
+.rforge-logo {
+  border: 0px;
+  float: left;
+  padding-right: 50px;
+}
+
+.unselectable {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Chrome/Safari/Opera */
+     -khtml-user-select: none; /* Konqueror */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+}
+
